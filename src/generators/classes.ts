@@ -13,7 +13,7 @@ export default async function getClassTip(): Promise<string | null> {
     const prof =
       cls.proficiencies[Math.floor(Math.random() * cls.proficiencies.length)];
     options.push(
-      `🛠️ **${cls.name}** starts with proficiency in **${prof.name}**.`
+      `🛠️ **${cls.name}s** start with a proficiency in **${prof.name}**.`
     );
   }
 

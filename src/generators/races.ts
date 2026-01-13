@@ -17,5 +17,5 @@ export default async function getRaceTip(): Promise<string | null> {
     "Use it to your advantage!",
   ]);
 
-  return `🧝 Race Fact: **${race.name}** has a trait called **${trait.name}** — ${description}`;
+  return `🧝 Race Fact: **${race.name}s** have a trait called **${trait.name}** — ${description}`;
 }
