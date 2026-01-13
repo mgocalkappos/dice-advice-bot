@@ -1,12 +1,21 @@
-import { fetchTip } from "./fetchTip";
+import { getRandomFromEndpoint, pickOne, API_BASE } from "./utils";
 
-export default async function getRaceTip(): Promise<string> {
-  return fetchTip(
-    "https://www.dnd5eapi.co/api/races",
-    (item) => (item as any).url,
-    (race: any) => {
-      const trait = race.traits[Math.floor(Math.random() * race.traits.length)];
-      return `🧝 Race Fact: **${race.name}** have a trait called **${trait.name}** — use it to your advantage!`;
-    }
-  );
+export default async function getRaceTip(): Promise<string | null> {
+  const race = await getRandomFromEndpoint("races");
+
+  const trait =
+    race.traits?.length &&
+    race.traits[Math.floor(Math.random() * race.traits.length)];
+
+  if (!trait) return null;
+
+  const traitDetailsRes = await fetch(API_BASE + trait.url);
+  const traitDetails = await traitDetailsRes.json();
+
+  const description = pickOne([
+    ...(traitDetails.desc ?? []),
+    "Use it to your advantage!",
+  ]);
+
+  return `🧝 Race Fact: **${race.name}** has a trait called **${trait.name}** — ${description}`;
 }

@@ -1,27 +1,21 @@
-import { fetchTip } from "./fetchTip";
+import { getRandomFromEndpoint, pickOne } from "./utils";
 
-export default async function getClassTip(): Promise<string> {
-  return fetchTip(
-    "https://www.dnd5eapi.co/api/classes",
-    (item) => (item as any).url,
-    (cls: any) => {
-      const options: string[] = [];
+export default async function getClassTip(): Promise<string | null> {
+  const cls = await getRandomFromEndpoint("classes");
 
-      if (cls.hit_die) {
-        options.push(`🎲 **${cls.name}** uses a d${cls.hit_die} for hit dice.`);
-      }
+  const options: string[] = [];
 
-      if (cls.proficiencies?.length) {
-        const prof =
-          cls.proficiencies[
-            Math.floor(Math.random() * cls.proficiencies.length)
-          ];
-        options.push(
-          `🛠️ **${cls.name}** starts with proficiency in **${prof.name}**.`
-        );
-      }
+  if (cls.hit_die) {
+    options.push(`🎲 **${cls.name}** uses a d${cls.hit_die} for hit dice.`);
+  }
 
-      return options[Math.floor(Math.random() * options.length)];
-    }
-  );
+  if (cls.proficiencies?.length) {
+    const prof =
+      cls.proficiencies[Math.floor(Math.random() * cls.proficiencies.length)];
+    options.push(
+      `🛠️ **${cls.name}** starts with proficiency in **${prof.name}**.`
+    );
+  }
+
+  return pickOne(options);
 }

@@ -1,31 +1,27 @@
-import { fetchTip } from "./fetchTip";
+import { getRandomFromEndpoint } from "./utils";
 
-export default async function getSpellTip(): Promise<string> {
-  return fetchTip(
-    "https://www.dnd5eapi.co/api/spells",
-    (item) => (item as any).url,
-    (spell: any) => {
-      const options: string[] = [];
+export default async function getSpellTip(): Promise<string | null> {
+  const spell = await getRandomFromEndpoint("spells");
 
-      options.push(`✨ **${spell.name}** is a level ${spell.level} spell.`);
+  if (!spell) return null;
 
-      if (spell.concentration) {
-        options.push(
-          `🧠 **${spell.name}** requires concentration — protect your caster!`
-        );
-      }
+  const parts: string[] = [];
 
-      if (spell.duration) {
-        options.push(`⏳ **${spell.name}** lasts ${spell.duration}.`);
-      }
+  parts.push(`✨ **${spell.name}** is a level ${spell.level} spell.`);
 
-      if (spell.damage?.damage_type?.name) {
-        options.push(
-          `💥 **${spell.name}** deals ${spell.damage.damage_type.name} damage.`
-        );
-      }
+  if (spell.concentration) {
+    parts.push(
+      `\n🧠 It requires concentration, so make sure you protect your caster!`
+    );
+  }
 
-      return options[Math.floor(Math.random() * options.length)];
-    }
-  );
+  if (spell.duration) {
+    parts.push(`\n⏳ Lasts ${spell.duration}.`);
+  }
+
+  if (spell.damage?.damage_type?.name) {
+    parts.push(`\n💥 Deals ${spell.damage.damage_type.name} damage.`);
+  }
+
+  return parts.join(" ");
 }

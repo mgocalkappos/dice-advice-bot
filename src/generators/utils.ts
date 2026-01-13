@@ -1,10 +1,12 @@
+export const API_BASE = "https://www.dnd5eapi.co";
+
 export async function getRandomFromEndpoint(endpoint: string) {
-  const listRes = await fetch(`https://www.dnd5eapi.co/api/${endpoint}`);
+  const listRes = await fetch(`${API_BASE}/api/${endpoint}`);
   const list = await listRes.json();
 
   const ref = list.results[Math.floor(Math.random() * list.results.length)];
 
-  const itemRes = await fetch(`https://www.dnd5eapi.co${ref.url}`);
+  const itemRes = await fetch(`${API_BASE}${ref.url}`);
   return itemRes.json();
 }
 

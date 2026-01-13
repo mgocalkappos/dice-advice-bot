@@ -1,39 +1,35 @@
-import { fetchTip } from "./fetchTip";
+import { getRandomFromEndpoint, pickOne } from "./utils";
 
-export default async function getMonsterTip(): Promise<string> {
-  return fetchTip(
-    "https://www.dnd5eapi.co/api/monsters",
-    (item) => (item as any).url,
-    (monster: any) => {
-      const options: string[] = [];
+export default async function getMonsterTip(): Promise<string | null> {
+  const monster = await getRandomFromEndpoint("monsters");
 
-      if (monster.damage_resistances?.length) {
-        options.push(
-          `🛡️ **${monster.name}** resists ${monster.damage_resistances.join(
-            ", "
-          )} damage.`
-        );
-      }
+  const options: string[] = [];
 
-      if (monster.special_abilities?.length) {
-        const ability =
-          monster.special_abilities[
-            Math.floor(Math.random() * monster.special_abilities.length)
-          ];
-        options.push(
-          `🧟 **${monster.name}** has **${ability.name}** — ${ability.desc}`
-        );
-      }
+  if (monster.damage_resistances?.length) {
+    options.push(
+      `🛡️ **${monster.name}** resists ${monster.damage_resistances.join(
+        ", "
+      )} damage.`
+    );
+  }
 
-      if (monster.actions?.length) {
-        const action =
-          monster.actions[Math.floor(Math.random() * monster.actions.length)];
-        options.push(
-          `⚔️ **${monster.name}** can use **${action.name}** in combat.`
-        );
-      }
+  if (monster.special_abilities?.length) {
+    const ability =
+      monster.special_abilities[
+        Math.floor(Math.random() * monster.special_abilities.length)
+      ];
+    options.push(
+      `🧟 **${monster.name}** has **${ability.name}** — ${ability.desc}`
+    );
+  }
 
-      return options[Math.floor(Math.random() * options.length)];
-    }
-  );
+  if (monster.actions?.length) {
+    const action =
+      monster.actions[Math.floor(Math.random() * monster.actions.length)];
+    options.push(
+      `⚔️ **${monster.name}** can use **${action.name}** in combat.`
+    );
+  }
+
+  return pickOne(options);
 }
