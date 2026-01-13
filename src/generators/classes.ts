@@ -1,5 +1,27 @@
 import { getRandomFromEndpoint, pickOne } from "./utils";
 
+const abilityMap: Record<string, string> = {
+  STR: "strength",
+  DEX: "dexterity",
+  CON: "constitution",
+  INT: "intelligence",
+  WIS: "wisdom",
+  CHA: "charisma",
+};
+
+function formatProficiency(name: string): string {
+  if (name.startsWith("Saving Throw: ")) {
+    const abbr = name.split(": ")[1];
+    return abilityMap[abbr] ?? abbr.toLowerCase();
+  }
+
+  if (name.startsWith("Skill: ")) {
+    return name.split(": ")[1].toLowerCase();
+  }
+
+  return name.toLowerCase();
+}
+
 export default async function getClassTip(): Promise<string | null> {
   const cls = await getRandomFromEndpoint("classes");
 
@@ -13,7 +35,9 @@ export default async function getClassTip(): Promise<string | null> {
     const prof =
       cls.proficiencies[Math.floor(Math.random() * cls.proficiencies.length)];
     options.push(
-      `🛠️ **${cls.name}s** start with a proficiency in **${prof.name}**.`
+      `🛠️ **${cls.name}** starts with proficiency in **${formatProficiency(
+        prof.name
+      )}**.`
     );
   }
 
