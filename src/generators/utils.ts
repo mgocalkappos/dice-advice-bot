@@ -14,3 +14,20 @@ export function pickOne(options: Array<string | null>) {
   const valid = options.filter(Boolean) as string[];
   return valid[Math.floor(Math.random() * valid.length)];
 }
+
+export const abilityMap: Record<string, string> = {
+  STR: "strength",
+  DEX: "dexterity",
+  CON: "constitution",
+  INT: "intelligence",
+  WIS: "wisdom",
+  CHA: "charisma",
+};
+
+export function formatList(items: string[]): string {
+  if (items.length === 0) return "";
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+
+  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+}

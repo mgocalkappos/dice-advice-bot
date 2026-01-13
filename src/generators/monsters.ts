@@ -1,4 +1,4 @@
-import { getRandomFromEndpoint, pickOne } from "./utils";
+import { getRandomFromEndpoint, pickOne, formatList } from "./utils";
 
 export default async function getMonsterTip(): Promise<string | null> {
   const monster = await getRandomFromEndpoint("monsters");
@@ -7,8 +7,8 @@ export default async function getMonsterTip(): Promise<string | null> {
 
   if (monster.damage_resistances?.length) {
     options.push(
-      `🛡️ **${monster.name}** resists ${monster.damage_resistances.join(
-        ", "
+      `🛡️ The **${monster.name}** is resistant to ${formatList(
+        monster.damage_resistances
       )} damage.`
     );
   }
@@ -18,16 +18,22 @@ export default async function getMonsterTip(): Promise<string | null> {
       monster.special_abilities[
         Math.floor(Math.random() * monster.special_abilities.length)
       ];
+
+    const description = ability.desc ? ` — ${ability.desc}` : "";
+
     options.push(
-      `🧟 **${monster.name}** has **${ability.name}** — ${ability.desc}`
+      `🧟 The **${monster.name}** has **${ability.name}** — ${description}`
     );
   }
 
   if (monster.actions?.length) {
     const action =
       monster.actions[Math.floor(Math.random() * monster.actions.length)];
+
+    const description = action.desc ? ` — ${action.desc}` : "";
+
     options.push(
-      `⚔️ **${monster.name}** can use **${action.name}** in combat.`
+      `⚔️ The **${monster.name}** can use **${action.name}** in combat${description}`
     );
   }
 

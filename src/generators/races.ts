@@ -1,21 +1,25 @@
 import { getRandomFromEndpoint, pickOne, API_BASE } from "./utils";
+import pluralize from "pluralize";
 
 export default async function getRaceTip(): Promise<string | null> {
   const race = await getRandomFromEndpoint("races");
 
-  const trait =
-    race.traits?.length &&
-    race.traits[Math.floor(Math.random() * race.traits.length)];
+  if (!race.traits?.length) return null;
 
-  if (!trait) return null;
+  const shuffledTraits = [...race.traits].sort(() => Math.random() - 0.5);
 
-  const traitDetailsRes = await fetch(API_BASE + trait.url);
-  const traitDetails = await traitDetailsRes.json();
+  for (const trait of shuffledTraits) {
+    const res = await fetch(API_BASE + trait.url);
+    const details = await res.json();
 
-  const description = pickOne([
-    ...(traitDetails.desc ?? []),
-    "Use it to your advantage!",
-  ]);
+    if (details.desc?.length) {
+      const description = pickOne(details.desc);
 
-  return `🧝 Race Fact: **${race.name}s** have a trait called **${trait.name}** — ${description}`;
+      return `🧝 Race Fact: **${pluralize(race.name)}** have a trait called **${
+        trait.name
+      }** — ${description}`;
+    }
+  }
+
+  return null;
 }

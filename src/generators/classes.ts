@@ -1,13 +1,5 @@
-import { getRandomFromEndpoint, pickOne } from "./utils";
-
-const abilityMap: Record<string, string> = {
-  STR: "strength",
-  DEX: "dexterity",
-  CON: "constitution",
-  INT: "intelligence",
-  WIS: "wisdom",
-  CHA: "charisma",
-};
+import { getRandomFromEndpoint, pickOne, abilityMap } from "./utils";
+import pluralize from "pluralize";
 
 function formatProficiency(name: string): string {
   if (name.startsWith("Saving Throw: ")) {
@@ -35,9 +27,9 @@ export default async function getClassTip(): Promise<string | null> {
     const prof =
       cls.proficiencies[Math.floor(Math.random() * cls.proficiencies.length)];
     options.push(
-      `🛠️ **${cls.name}** starts with proficiency in **${formatProficiency(
-        prof.name
-      )}**.`
+      `🛠️ **${pluralize(
+        cls.name
+      )}** start with proficiency in **${formatProficiency(prof.name)}**.`
     );
   }
 
