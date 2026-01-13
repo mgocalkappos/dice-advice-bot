@@ -1,11 +1,16 @@
 import { getRandomFromEndpoint, pickOne } from "./utils";
 
 export default async function getConditionTip() {
-  const condition = await getRandomFromEndpoint("conditions");
+  let condition;
+  let options: string[] = [];
 
-  return pickOne([
-    `⚠️ **${condition.name}** condition.`,
-    condition.desc?.[0] ?? null,
-    condition.desc?.[1] ?? null,
-  ]);
+  do {
+    condition = await getRandomFromEndpoint("conditions");
+    options = [
+      condition.desc?.length ? condition.desc[0] : null,
+      condition.desc?.length > 1 ? condition.desc[1] : null,
+    ].filter(Boolean);
+  } while (options.length === 0);
+
+  return pickOne(options);
 }
