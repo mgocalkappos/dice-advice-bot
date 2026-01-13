@@ -12,5 +12,5 @@ export default async function getConditionTip() {
     ].filter(Boolean);
   } while (options.length === 0);
 
-  return pickOne(options);
+  return `🧪 Condition Tip: ${pickOne(options)}`;
 }
