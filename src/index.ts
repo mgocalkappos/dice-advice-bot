@@ -21,7 +21,7 @@ const client = new Client({
 
 const CHANNEL_ID = process.env.CHANNEL_ID as string;
 
-const tipGenerators: Array<() => Promise<string>> = [
+const tipGenerators: Array<() => Promise<string | null>> = [
   getMonsterTip,
   getSpellTip,
   getClassTip,
@@ -35,26 +35,37 @@ const tipGenerators: Array<() => Promise<string>> = [
 ];
 
 async function getDailyTip(): Promise<string> {
-  const generator =
-    tipGenerators[Math.floor(Math.random() * tipGenerators.length)];
-  return await generator();
+  const MAX_ATTEMPTS = 10;
+
+  for (let i = 0; i < MAX_ATTEMPTS; i++) {
+    try {
+      const generator =
+        tipGenerators[Math.floor(Math.random() * tipGenerators.length)];
+      const tip = await generator();
+      if (tip) return tip;
+    } catch (err) {
+      console.error("Tip generator failed:", err);
+    }
+  }
+
+  return "📜 A mysterious silence hangs over the realm today.";
 }
 
 client.once("ready", async () => {
   const channel = (await client.channels.fetch(CHANNEL_ID)) as TextChannel;
-  if (!channel) return;
+  if (!channel || !channel.isTextBased()) {
+    console.error("Invalid channel ID or channel is not text-based");
+    return;
+  }
 
-  const tip = await getDailyTip();
-  await channel.send(`🎲 Test!\n${tip}`);
-
-  // cron.schedule(
-  //   "0 18 * * *",
-  //   async () => {
-  //     const tip = await getDailyTip();
-  //     await channel.send(`🎲 **Daily D&D Tip** 🎲\n${tip}`);
-  //   },
-  //   { timezone: "America/Chicago" }
-  // );
+  cron.schedule(
+    "0 18 * * *",
+    async () => {
+      const tip = await getDailyTip();
+      await channel.send(`🎲 **Today's Tip** 🎲\n${tip}`);
+    },
+    { timezone: "America/Chicago" }
+  );
 });
 
 client.login(process.env.DISCORD_TOKEN);
